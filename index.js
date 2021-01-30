@@ -68,8 +68,8 @@ function addRole() {
         ])
         .then((response) => {
             // find dept id based on dept name
-            
-            connection.query("SELECT id FROM departments WHERE ?", {name: response.role_department}, function(err, data) {
+
+            connection.query("SELECT id FROM departments WHERE ?", { name: response.role_department }, function (err, data) {
                 if (err) throw err;
                 var department_id = data[0].id;
                 connection.query("INSERT INTO roles SET ?", { title: response.role_title, salary: response.role_salary, department_id: department_id }, function (err, result) {
@@ -120,12 +120,12 @@ function addEmpl(first_name, last_name, role_id, manager_id) {
         .then((response) => {
             // find role id based on role name
             //      find manager id based on manager name
-            connection.query("SELECT id FROM roles WHERE ?", {title: response.role}, function(err, data) {
+            connection.query("SELECT id FROM roles WHERE ?", { title: response.role }, function (err, data) {
                 if (err) throw err;
                 var roleid = data[0].id;
                 // split manager name into first, last names
                 var manager_name = response.manager.split(" ");
-                connection.query("SELECT id FROM employees WHERE ? AND ?", [{first_name: manager_name[0]}, {last_name: manager_name[1]}], function(err, data) {
+                connection.query("SELECT id FROM employees WHERE ? AND ?", [{ first_name: manager_name[0] }, { last_name: manager_name[1] }], function (err, data) {
                     if (err) throw err;
                     var managerid = data[0].id;
                     connection.query("INSERT INTO employees SET ?", { first_name: response.firstname, last_name: response.lastname, role_id: roleid, manager_id: managerid }, function (err, result) {
@@ -195,7 +195,7 @@ function viewRole() {
 function viewEmpl() {
     // find names of roles based on ids
     // find name of manager based on id?
-    connection.query(`SELECT e1.first_name, e1.last_name, CONCAT(e2.first_name, ' ', e2.last_name) AS 'Manager', r.title FROM roles as r INNER JOIN employees as e1 ON e1.role_id = r.id LEFT JOIN employees as e2 ON e1.manager_id = e2.id`, function (err, data) {
+    connection.query(`SELECT e1.id, e1.first_name, e1.last_name, CONCAT(e2.first_name, ' ', e2.last_name) AS 'Manager', r.title FROM roles as r INNER JOIN employees as e1 ON e1.role_id = r.id LEFT JOIN employees as e2 ON e1.manager_id = e2.id`, function (err, data) {
         if (err) throw err;
         newTable = cTable.getTable(data);
         console.table(newTable);
@@ -214,13 +214,51 @@ function viewEmpl() {
     });
 }
 
-function updateEmpl(newRoleId, id) {
+function updateEmpl() {
     // find the id of the new role
     // find the department id of the new role
     // set the employee's role id to the role id
     // set the employees department id to the new one
-    connection.query("UPDATE `employees` SET ? WHERE ?;", [{ role_id: newRoleId }, { id: id }], function (err, data) {
+
+    connection.query(`SELECT e1.first_name, e1.last_name, CONCAT(e2.first_name, ' ', e2.last_name) AS 'Manager', r.title FROM roles as r INNER JOIN employees as e1 ON e1.role_id = r.id LEFT JOIN employees as e2 ON e1.manager_id = e2.id`, function (err, data) {
         if (err) throw err;
+        newTable = cTable.getTable(data);
+        console.table(newTable);
+        inquirer
+            .prompt([
+                {
+                    type: 'list',
+                    message: 'Employees listed, press enter to continue',
+                    choices: ["Continue"],
+                    name: 'confirmation'
+                }
+            ])
+            .then((response) => {
+                inquirer
+                    .prompt([
+                        {
+                            type: 'number',
+                            message: 'What is the id of the employee you would like to update?',
+                            name: 'id'
+                        },
+                        {
+                            type: 'input',
+                            message: 'What is the employees new role?',
+                            name: 'newRole'
+                        }
+                    ])
+                    .then((response) => {
+                        connection.query("SELECT id FROM roles WHERE ?", { title: response.newRole }, function (err, data) {
+                            if (err) throw err;
+                            var newRoleId = data[0].id;
+                            connection.query("UPDATE `employees` SET ? WHERE ?;", [{ role_id: newRoleId }, { id: response.id }], function (err, data) {
+                                if (err) throw err;
+                                console.log("Employee Updated!");
+                                init();
+                            });
+                        })
+                    });
+            });
     });
 }
 // addDept("quality assurance");
