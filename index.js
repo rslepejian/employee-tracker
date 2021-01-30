@@ -18,10 +18,33 @@ connection.connect(function (err) {
     console.log("connected as id " + connection.threadId);
 });
 
-function addDept(name) {
-    connection.query("INSERT INTO departments SET ?", { name: name }, function (err, result) {
-        if (err) throw err;
-    });
+function addDept() {
+    inquirer
+        .prompt([
+            {
+                type: 'input',
+                message: 'What is the new department called?',
+                name: 'dept_name'
+            }
+        ])
+        .then((response) => {
+            connection.query("INSERT INTO departments SET ?", { name: response.dept_name }, function (err, result) {
+                if (err) throw err;
+            });
+            console.log("Department added!");
+            inquirer
+                .prompt([
+                    {
+                        type: 'list',
+                        message: 'Press enter to continue',
+                        choices: ["Continue"],
+                        name: 'confirmation'
+                    }
+                ])
+                .then((response) => {
+                    init();
+                });
+        });
 }
 
 function addRole(title, salary, department_id) {
@@ -42,17 +65,17 @@ function viewDept() {
         newTable = cTable.getTable(data);
         console.table(newTable);
         inquirer
-        .prompt([
-            {
-                type: 'list',
-                message: 'Press enter to continue',
-                choices: ["Continue"],
-                name: 'confirmation'
-            }
-        ])
-        .then((response) => {
-            init();
-        });
+            .prompt([
+                {
+                    type: 'list',
+                    message: 'Press enter to continue',
+                    choices: ["Continue"],
+                    name: 'confirmation'
+                }
+            ])
+            .then((response) => {
+                init();
+            });
     });
 }
 
@@ -64,17 +87,17 @@ function viewRole() {
         newTable = cTable.getTable(data);
         console.table(newTable);
         inquirer
-        .prompt([
-            {
-                type: 'list',
-                message: 'Press enter to continue',
-                choices: ["Continue"],
-                name: 'confirmation'
-            }
-        ])
-        .then((response) => {
-            init();
-        });
+            .prompt([
+                {
+                    type: 'list',
+                    message: 'Press enter to continue',
+                    choices: ["Continue"],
+                    name: 'confirmation'
+                }
+            ])
+            .then((response) => {
+                init();
+            });
     });
 }
 
@@ -86,17 +109,17 @@ function viewEmpl() {
         newTable = cTable.getTable(data);
         console.table(newTable);
         inquirer
-        .prompt([
-            {
-                type: 'list',
-                message: 'Press enter to continue',
-                choices: ["Continue"],
-                name: 'confirmation'
-            }
-        ])
-        .then((response) => {
-            init();
-        });
+            .prompt([
+                {
+                    type: 'list',
+                    message: 'Press enter to continue',
+                    choices: ["Continue"],
+                    name: 'confirmation'
+                }
+            ])
+            .then((response) => {
+                init();
+            });
     });
 }
 
@@ -125,7 +148,7 @@ function init() {
             {
                 type: 'list',
                 message: 'What would you like to do?',
-                choices: ['See Departments', 'See Roles', 'See Employees', 'Add Departments', 'Add Roles', 'Add Employees', 'Update Employee Role'],
+                choices: ['See Departments', 'See Roles', 'See Employees', 'Add a Department', 'Add a Role', 'Add an Employee', 'Update Employee Role'],
                 name: 'choice'
             }
         ])
@@ -140,13 +163,13 @@ function init() {
                 case 'See Employees':
                     viewEmpl();
                     break;
-                case 'Add Departments':
+                case 'Add a Department':
+                    addDept();
+                    break;
+                case 'Add a Role':
 
                     break;
-                case 'Add Roles':
-
-                    break;
-                case 'Add Employees':
+                case 'Add an Employee':
 
                     break;
                 case 'Update Employee Role':
