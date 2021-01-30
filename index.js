@@ -47,10 +47,51 @@ function addDept() {
         });
 }
 
-function addRole(title, salary, department_id) {
-    connection.query("INSERT INTO roles SET ?", { title: title, salary: salary, department_id: department_id }, function (err, result) {
-        if (err) throw err;
-    });
+function addRole() {
+    inquirer
+        .prompt([
+            {
+                type: 'input',
+                message: 'What is the new roles title?',
+                name: 'role_title'
+            },
+            {
+                type: 'number',
+                message: 'What is the new roles salary?',
+                name: 'role_salary'
+            },
+            {
+                type: 'input',
+                message: 'What is the new roles department?',
+                name: 'role_department'
+            }
+        ])
+        .then((response) => {
+            // find dept id based on dept name
+            
+            connection.query("SELECT id FROM departments WHERE ?", {name: response.role_department}, function(err, data) {
+                if (err) throw err;
+                console.log(data);
+                var department_id = data[0].id;
+                connection.query("INSERT INTO roles SET ?", { title: response.role_title, salary: response.role_salary, department_id: department_id }, function (err, result) {
+                    if (err) throw err;
+                });
+                console.log("Role added!");
+                inquirer
+                    .prompt([
+                        {
+                            type: 'list',
+                            message: 'Press enter to continue',
+                            choices: ["Continue"],
+                            name: 'confirmation'
+                        }
+                    ])
+                    .then((response) => {
+                        init();
+                    });
+            });
+
+        });
 }
 
 function addEmpl(first_name, last_name, role_id, manager_id) {
@@ -167,7 +208,7 @@ function init() {
                     addDept();
                     break;
                 case 'Add a Role':
-
+                    addRole();
                     break;
                 case 'Add an Employee':
 
