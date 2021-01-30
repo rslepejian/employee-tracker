@@ -220,7 +220,7 @@ function updateEmpl() {
     // set the employee's role id to the role id
     // set the employees department id to the new one
 
-    connection.query(`SELECT e1.first_name, e1.last_name, CONCAT(e2.first_name, ' ', e2.last_name) AS 'Manager', r.title FROM roles as r INNER JOIN employees as e1 ON e1.role_id = r.id LEFT JOIN employees as e2 ON e1.manager_id = e2.id`, function (err, data) {
+    connection.query(`SELECT e1.id, e1.first_name, e1.last_name, CONCAT(e2.first_name, ' ', e2.last_name) AS 'Manager', r.title FROM roles as r INNER JOIN employees as e1 ON e1.role_id = r.id LEFT JOIN employees as e2 ON e1.manager_id = e2.id`, function (err, data) {
         if (err) throw err;
         newTable = cTable.getTable(data);
         console.table(newTable);
