@@ -15,13 +15,13 @@ This is a command line application that runs on node.js to allow users to see an
 
 
 ## Installation Instructions
-To install this app you need node installed. Once node is installed and added to path, clone the repository and run npm install in the cloned directory to download the dependencies (mysql, inquirer, console.table). You must also have mysql workbench.
+To install this app you need node installed. Once node is installed and added to path, clone the repository and run npm install in the cloned directory to download the dependencies (mysql, inquirer, console.table). You must also have mysql workbench. 
 
 ## Usage Instructions
-To run the app, from command line navigate to the directory containing the index.js file, then input: "node index.js" then follow the onscreen prompts in your terminal.
+To run the app, first make sure that the schema in schema.sql has been run in workbench. To do this copy and paste what is in the schema.sql file and paste it into mysql workbench. Click on the lightning bolt to run and set up the database. Make sure that in a separate tab in workbench you have run the following command by pasting it in and hitting the lightning bolt: "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password'". From command line navigate to the directory containing the index.js file, then input: "node index.js" then follow the onscreen prompts in your terminal. 
 
 ## Preview of Working App
-
+* [Click Here to See Preview Video]()
 
 ## Code Snippet
 This code snippet shows the code that is executed to return and display a table of every employee and their ids, first and last names, managers, and roles. This code snippet was included because the crux of this entire application was being able to display the appropriate information for each employee without deviating from sql schema that were as simple as possible. In order to achieve this a very long sql query had to be used here involving two types of joins and aliasing the employees table so that it could be joined with itself. It had to be joined with itself so that managers could be displayed for each employee because the manager_id external id column in the employees table is a reference to the id column in the employees table, and not a reference to a separate table of managers.
