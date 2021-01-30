@@ -1,15 +1,3 @@
-// functions needed:   add
-//      add department
-//      add role
-//      add employeee
-// functions needed:   view
-//      departments
-//      roles
-//      employees
-// functions needed:   update
-//      employee roles
-
-
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 const cTable = require('console.table');
@@ -53,6 +41,18 @@ function viewDept() {
         if (err) throw err;
         newTable = cTable.getTable(data);
         console.table(newTable);
+        inquirer
+        .prompt([
+            {
+                type: 'list',
+                message: 'Press enter to continue',
+                choices: ["Continue"],
+                name: 'confirmation'
+            }
+        ])
+        .then((response) => {
+            init();
+        });
     });
 }
 
@@ -63,6 +63,18 @@ function viewRole() {
         if (err) throw err;
         newTable = cTable.getTable(data);
         console.table(newTable);
+        inquirer
+        .prompt([
+            {
+                type: 'list',
+                message: 'Press enter to continue',
+                choices: ["Continue"],
+                name: 'confirmation'
+            }
+        ])
+        .then((response) => {
+            init();
+        });
     });
 }
 
@@ -73,15 +85,27 @@ function viewEmpl() {
         if (err) throw err;
         newTable = cTable.getTable(data);
         console.table(newTable);
+        inquirer
+        .prompt([
+            {
+                type: 'list',
+                message: 'Press enter to continue',
+                choices: ["Continue"],
+                name: 'confirmation'
+            }
+        ])
+        .then((response) => {
+            init();
+        });
     });
 }
 
-function updateEmpl(newRoleId, firstname, lastname, id) {
+function updateEmpl(newRoleId, id) {
     // find the id of the new role
     // find the department id of the new role
     // set the employee's role id to the role id
     // set the employees department id to the new one
-    connection.query("UPDATE `employees` SET ? WHERE ? AND ? AND ?;", [{role_id: newRoleId}, {first_name: firstname}, {last_name: lastname}, {id: id}], function (err, data) {
+    connection.query("UPDATE `employees` SET ? WHERE ?;", [{ role_id: newRoleId }, { id: id }], function (err, data) {
         if (err) throw err;
     });
 }
@@ -89,11 +113,49 @@ function updateEmpl(newRoleId, firstname, lastname, id) {
 // addRole("quality tester", 15, 4);
 // addEmpl("qual", "testy", 4, 1);
 
-// updateEmpl(2, "tech", "nician", 2);
+// updateEmpl(2, 2);
 
 // viewDept();
-viewEmpl();
+// viewEmpl();
 // viewRole();
 
+function init() {
+    inquirer
+        .prompt([
+            {
+                type: 'list',
+                message: 'What would you like to do?',
+                choices: ['See Departments', 'See Roles', 'See Employees', 'Add Departments', 'Add Roles', 'Add Employees', 'Update Employee Role'],
+                name: 'choice'
+            }
+        ])
+        .then((response) => {
+            switch (response.choice) {
+                case 'See Departments':
+                    viewDept();
+                    break;
+                case 'See Roles':
+                    viewRole();
+                    break;
+                case 'See Employees':
+                    viewEmpl();
+                    break;
+                case 'Add Departments':
+
+                    break;
+                case 'Add Roles':
+
+                    break;
+                case 'Add Employees':
+
+                    break;
+                case 'Update Employee Role':
+
+                    break;
+            }
+        });
+}
+
+init();
 
 
