@@ -71,7 +71,6 @@ function addRole() {
             
             connection.query("SELECT id FROM departments WHERE ?", {name: response.role_department}, function(err, data) {
                 if (err) throw err;
-                console.log(data);
                 var department_id = data[0].id;
                 connection.query("INSERT INTO roles SET ?", { title: response.role_title, salary: response.role_salary, department_id: department_id }, function (err, result) {
                     if (err) throw err;
@@ -95,9 +94,60 @@ function addRole() {
 }
 
 function addEmpl(first_name, last_name, role_id, manager_id) {
-    connection.query("INSERT INTO employees SET ?", { first_name: first_name, last_name: last_name, role_id: role_id, manager_id: manager_id }, function (err, result) {
-        if (err) throw err;
-    });
+    inquirer
+        .prompt([
+            {
+                type: 'input',
+                message: 'What is the new employees first name?',
+                name: 'firstname'
+            },
+            {
+                type: 'input',
+                message: 'What is the new employees last name?',
+                name: 'lastname'
+            },
+            {
+                type: 'input',
+                message: 'What is the new employees role?',
+                name: 'role'
+            },
+            {
+                type: 'input',
+                message: 'Who is the new employees manager?',
+                name: 'manager'
+            }
+        ])
+        .then((response) => {
+            // find role id based on role name
+            //      find manager id based on manager name
+            connection.query("SELECT id FROM roles WHERE ?", {title: response.role}, function(err, data) {
+                if (err) throw err;
+                var roleid = data[0].id;
+                // split manager name into first, last names
+                var manager_name = response.manager.split(" ");
+                connection.query("SELECT id FROM employees WHERE ? AND ?", [{first_name: manager_name[0]}, {last_name: manager_name[1]}], function(err, data) {
+                    if (err) throw err;
+                    var managerid = data[0].id;
+                    connection.query("INSERT INTO employees SET ?", { first_name: response.firstname, last_name: response.lastname, role_id: roleid, manager_id: managerid }, function (err, result) {
+                        if (err) throw err;
+                    });
+                    console.log("Employee added!");
+                    inquirer
+                        .prompt([
+                            {
+                                type: 'list',
+                                message: 'Press enter to continue',
+                                choices: ["Continue"],
+                                name: 'confirmation'
+                            }
+                        ])
+                        .then((response) => {
+                            init();
+                        });
+                })
+            });
+
+        });
 }
 
 function viewDept() {
@@ -211,10 +261,10 @@ function init() {
                     addRole();
                     break;
                 case 'Add an Employee':
-
+                    addEmpl();
                     break;
                 case 'Update Employee Role':
-
+                    updateEmpl();
                     break;
             }
         });
